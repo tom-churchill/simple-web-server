@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Directory listing for {{ display_path }}
+{% endblock %}
+
+{% block head %}
+{% endblock %}
+
+{% block content %}
+    <div class="title">
+        <span class="path-label">Path: </span>
+        {% for url, name in path_parts %}
+            <span class="title-directory"><a href="{{ url }}">{{ name }}</a></span>
+        {% endfor %}
+    </div>
+
+    <pre style="word-wrap: break-word; white-space: pre-wrap;">{{ error or contents }}</pre>
+{% endblock %}

@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Directory listing for {{ display_path }}
+{% endblock %}
+
+{% block head %}
+    <script>
+        // since we are storing data on the localhost, other services may also be run on the port and collide
+        // with the stored date, using the guid as a namespace will avoid this.
+        var guid = "{{ guid }}";
+
+        //var order = 0;
+        $(document).ready(function () {
+
+            var last_sort_column = parseInt(localStorage.getItem(guid + "_last_sort_column") || 1);
+            var last_sort_order = parseInt(localStorage.getItem(guid + "_last_sort_order") || 0);
+            var sort_order = [[ 1, "asc" ]];
+
+            if (last_sort_column === 1 && last_sort_order === 2) {
+                sort_order = [[ 0, "desc" ], [ 1, "asc" ]];
+            } else if (last_sort_column === 1 && last_sort_order === 3) {
+                sort_order = [[ 0, "asc" ], [ 1, "desc" ]];
+            } else if (last_sort_order === 0) {
+                sort_order = [[ last_sort_column, "asc" ]];
+            }  else if (last_sort_order === 1) {
+                sort_order = [[ last_sort_column, "desc" ]];
+            }
+
+            var emptyTableMessage = "directory is empty";
+            {% if error_message != None %}
+                emptyTableMessage = "{{ error_message }}";
+            {% endif %}
+
+            var table = $('#files').DataTable({
+                order: sort_order,
+                paging: false,
+                language: {
+                    search: "_INPUT_",
+                    searchPlaceholder: "Filter",
+                    emptyTable: emptyTableMessage,
+                },
+                columnDefs: [
+                    {
+                        targets: -1,
+                        className: 'dt-left',
+                        orderable: false
+
+                    },
+                    {
+                        targets: -2,
+                        className: 'dt-right',
+
+                    },
+                    {
+                        targets: -3,
+                        className: 'dt-left',
+                    },
+                    {
+                        targets: -4,
+                        className: 'dt-left',
+                    },
+                    {
+                        targets: -5,
+                        className: 'dt-right',
+                        visible: true,
+                    },
+                ],
+            });
+
+            $('#files thead').on('click', 'th', function (event) {
+                var column = table.column(this).index();
+
+                // reset order index when a different column in clicked
+                if (column !== last_sort_column) {
+                    last_sort_order = 3;
+                }
+
+                if (column !== 1) {
+                    last_sort_order = (last_sort_order + 1) % 2;
+                    last_sort_column = column;
+                } else {
+                    last_sort_order = (last_sort_order + 1) % 4;
+                    last_sort_column = column;
+
+                    if (last_sort_order === 0) {
+                        table.order( [ 1, 'asc' ] ).draw();
+                    } else if (last_sort_order === 1) {
+                        table.order( [ 1, 'desc' ] ).draw();
+                    } else if (last_sort_order === 2) {
+                        table.order([ 0, "desc" ], [ 1, "asc" ]).draw();
+                    } else {
+                        table.order([ 0, "asc" ], [ 1, "desc" ]).draw();
+                    }
+
+                    event.preventDefault();
+                }
+
+                localStorage.setItem(guid + "_last_sort_column", last_sort_column);
+                localStorage.setItem(guid + "_last_sort_order", last_sort_order);
+            });
+        });
+    </script>
+{% endblock %}
+
+{% block content %}
+    <div class="title">
+        <span class="path-label">Path: </span>
+        {% for url, name in path_parts %}
+            <span class="title-directory"><a href="{{ url }}">{{ name }}</a></span>
+        {% endfor %}
+    </div>
+
+    <table id="files" class="display" style="width: 100%">
+        <thead>
+            <tr>
+                <th class="is-directory-header is-directory-column"></th>
+                <th class="name-column">Name</th>
+                <!--<th>Type</th>!-->
+                <th class="date-modified-column">Date Modified</th>
+                <th class="size-column">Size</th>
+                <th class="options-column"></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for name, name_path, is_directory, is_directory_order, date_modified_unix_time, date_modified_iso, date_modified_str, file_size_str, file_size_search_str, file_size_search_str, is_media, sharable_link in file_parts %}
+                <tr>
+                    <td class="is-directory-column" data-order="{{ is_directory_order}}">
+                        <img class="directory-image-{{ is_directory }} link-elem" src="/static/baseline-folder-24px.svg" />
+                    </td>
+                    <td class="name-column" data-sort="{{ name }}">
+                        <a class="name-cell" href="/path/{{ name_path }}">
+                            <img class="directory-image-{{ is_directory }} link-elem" src="/static/baseline-folder-24px.svg" />
+                            <span class="link-elem">{{ name }}</span>
+                        </a>
+                    </td>
+                    <td data-search="{{ date_modified_iso }}"  data-sort="{{ date_modified_unix_time }}" title="{{ date_modified_iso }}">{{ date_modified_str }}</td>
+                    <td data-search="{{ file_size_search_str }}" data-sort="{{ file_size_search_str }}" title="{{ file_size_search_str }} bytes">{{ file_size_str }}</td>
+                    <td class="options-cell">
+                        {% if sharable_link != None %}
+                            <a class="icon-button" href="{{ sharable_link }}">
+                                <img class="link-elem" title="A link that can be used without being logged in" src="/static/baseline-lock_open-24px.svg" />
+                            </a>
+                        {% endif %}
+
+                        {% if is_directory == False %}
+                            <a class="icon-button" href="/view-text/{{ name_path }}">
+                                <img class="link-elem" title="View as Text" src="/static/baseline-notes-24px.svg" />
+                            </a>
+                        {% endif %}
+                        {% if is_media == True %}
+                            <a class="icon-button" href="/play-media/{{ name_path }}">
+                                <img class="link-elem" src="/static/baseline-play_circle_outline-24px.svg" />
+                            </a>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
+
+{% block margin_items %}
+    {% if is_logged_in == True %}
+        <div class="margin-link logout"><a href="/logout">Logout</a></div>
+    {% endif %}
+{% endblock %}

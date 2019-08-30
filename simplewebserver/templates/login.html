@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Login
+{% endblock %}
+
+{% block head %}
+{% endblock %}
+
+{% block content %}
+    <form class="login-form" method="post">
+            <div class="login-container">
+                <div class="login-title">Simple Web Server</div>
+                <div class="login-error-message">{{ error_message }}</div>
+                <input class="login-password-field" type="password" name="password" placeholder="Password" autocomplete="off">
+                <input class="login-submit" type="submit" value="Login">
+            </div>
+    </form>
+{% endblock %}

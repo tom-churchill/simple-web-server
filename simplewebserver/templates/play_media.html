@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    <link rel="shortcut icon" href="data:image/x-icon;," type="image/x-icon">
+    <title>Video: for</title>
+    <style>
+        html {
+            background-color: black;
+        }
+
+        video {
+            margin: auto;
+            display: inherit;
+            position: absolute;
+            left: 0;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            max-width: 100%;
+            max-height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="content">
+        <video controls autoplay>
+            <source src="/path/{{ path }}" preload="auto" />
+        </video>
+    </div>
+    <script>
+        var body = document.querySelector('body');
+        var video = document.querySelector('video');
+        body.addEventListener('keydown', logKey);
+
+        function logKey(e) {
+            var time = video.currentTime;
+
+            if (e.code === "ArrowLeft") {
+                time = Math.max(time - 3, 0);
+            }
+
+            if (e.code === "ArrowRight") {
+                time = Math.min(time + 3, video.duration);
+            }
+
+            if (e.code === "Space") {
+                if (video.paused === false) {
+                  video.pause();
+              } else {
+                  video.play();
+              }
+            }
+
+            console.log(time);
+            if (isNaN(time) === false) {
+                video.currentTime = time;
+                // video.play();
+            }
+
+
+            console.log(e.code);
+            console.log(e);
+        }
+    </script>
+</body>
+</html>
