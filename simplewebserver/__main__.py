@@ -1,5 +1,4 @@
 from sanic import Sanic
-from sanic import response
 import sanic_cookiesession
 from getpass import getpass
 import os
@@ -34,26 +33,6 @@ sanic_cookiesession.setup(app)
 # initialise Sanic-Auth
 app.config.AUTH_LOGIN_ENDPOINT = 'routes.login'
 auth = auth.setup(app)
-
-
-# Sanic for some reason removes the Content-Length header when streaming a response.
-# This means that a file downloading won't show its progress.
-# This is a workaround to monkey patch the Content-Length header back in.
-# When the Hook-Content-Length header is set it will set the Content-Length header
-# to its value and then delete itself.
-# noinspection PyProtectedMember
-# old_parse_headers = response.StreamingHTTPResponse._parse_headers
-
-
-# def hooked_parse_headers(self):
-#     if 'Monkey-Patch-Content-Length' in self.headers is not None:
-#         self.headers['Content-Length'] = self.headers['Monkey-Patch-Content-Length']
-#         del self.headers['Monkey-Patch-Content-Length']
-#
-#     return old_parse_headers(self)
-#
-#
-# response.StreamingHTTPResponse._parse_headers = hooked_parse_headers
 
 
 def generate_login_hash_function():

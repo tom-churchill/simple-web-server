@@ -204,10 +204,7 @@ async def handle_path(request, path):
             range_object.end = min(range_object.end, range_object.start + chunk_size - 1)
             range_object.size = range_object.end - range_object.start + 1
 
-        headers = {
-            'Accept-Ranges': 'Accept-Ranges: bytes',
-            'Monkey-Patch-Content-Length': file_size,
-        }
+        headers = {'Accept-Ranges': 'Accept-Ranges: bytes'}
 
         return await response.file_stream(
             full_path,
