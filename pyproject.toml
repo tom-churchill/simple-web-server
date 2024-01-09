@@ -1,0 +1,36 @@
+[project]
+name = "simple_web_server"
+version = "1.0.0"
+description = "An alternative to http.server which supports multiple connections, authentication and SSL."
+authors = [
+    {name = "Tom Churchill", email = "tom@tomchurchill.co.uk"},
+    {name = "Tom Churchill", email = "tom@tomchurchill.co.uk "},
+]
+dependencies = [
+    "setuptools>=69.0.3",
+    "Jinja2>=2.10.1",
+    "sanic-cookiesession>=0.3.1",
+    "bcrypt>=3.1.7",
+    "docopt>=0.6.2",
+    "sanic>=23.12.0",
+    "sanic-auth>=0.3.0",
+]
+requires-python = ">=3.10"
+readme = "README.md"
+license = {text = "MIT"}
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: Microsoft :: Windows",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.6",
+]
+
+
+[project.urls]
+Homepage = "https://github.com/tom-churchill/simple-web-server"
+[tool.pdm]
+package-type = "library"
+
+[build-system]
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"

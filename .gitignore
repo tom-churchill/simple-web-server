@@ -1,3 +1,9 @@
 .idea/*
 venv/*
 screenshots/*
+run.bat
+run.bat.lnk
+run.ps
+.pdm-python
+cert/*
+*.pyc

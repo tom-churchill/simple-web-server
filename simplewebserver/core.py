@@ -3,7 +3,7 @@ from sanic_auth import Auth
 import docopt
 import os
 from jinja2 import Environment, PackageLoader
-from .util import generate_random_hash
+from util import generate_random_hash
 
 help_string = """
 Usage:

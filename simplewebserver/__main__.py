@@ -5,12 +5,16 @@ from getpass import getpass
 import os
 import bcrypt
 import ssl
-from .util import generate_random_hash
-from .routes import bp
-from .core import auth, dir_path, guid, host, port, generate_login_hash, use_login_hash, certificate_file, certificate_key, allow_insecure
+from util import generate_random_hash
+from routes import bp
+from core import auth, dir_path, guid, host, port, generate_login_hash, use_login_hash, certificate_file, certificate_key, allow_insecure
 
 # initialise Sanic
 app = Sanic(__name__)
+
+static_directory = os.path.join(dir_path, 'static')
+app.static('/static', static_directory)
+
 app.blueprint(bp)
 
 # initialise Sanic-CookieSession
@@ -38,18 +42,18 @@ auth = auth.setup(app)
 # When the Hook-Content-Length header is set it will set the Content-Length header
 # to its value and then delete itself.
 # noinspection PyProtectedMember
-old_parse_headers = response.StreamingHTTPResponse._parse_headers
+# old_parse_headers = response.StreamingHTTPResponse._parse_headers
 
 
-def hooked_parse_headers(self):
-    if 'Monkey-Patch-Content-Length' in self.headers is not None:
-        self.headers['Content-Length'] = self.headers['Monkey-Patch-Content-Length']
-        del self.headers['Monkey-Patch-Content-Length']
-
-    return old_parse_headers(self)
-
-
-response.StreamingHTTPResponse._parse_headers = hooked_parse_headers
+# def hooked_parse_headers(self):
+#     if 'Monkey-Patch-Content-Length' in self.headers is not None:
+#         self.headers['Content-Length'] = self.headers['Monkey-Patch-Content-Length']
+#         del self.headers['Monkey-Patch-Content-Length']
+#
+#     return old_parse_headers(self)
+#
+#
+# response.StreamingHTTPResponse._parse_headers = hooked_parse_headers
 
 
 def generate_login_hash_function():
@@ -78,9 +82,6 @@ if __name__ == '__main__':
         print("Authentication without SSL is only possible if the --allow-insecure flag is set.")
         print("Only use if you are aware of the security implications.")
     else:
-        static_directory = os.path.join(dir_path, 'static')
-        app.static('/static', static_directory)
-
         # setup ssl
         context = None
         if certificate_file is not None and certificate_key is not None:

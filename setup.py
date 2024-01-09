@@ -10,7 +10,7 @@ else:
 
 setuptools.setup(
     name='simple-web-server',
-    version='1.0.0',
+    version='1.0.1',
     author='Tom Churchill',
     author_email='tom@tomchurchill.co.uk ',
     description='An alternative to http.server which supports multiple connections, authentication and SSL.',

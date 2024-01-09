@@ -5,8 +5,8 @@ import bcrypt
 import types
 from datetime import datetime
 from sanic_auth import User
-from .util import conditional_decorator, get_path_parts, format_bytes
-from .core import (
+from util import conditional_decorator, get_path_parts, format_bytes
+from core import (
     auth,
     env,
     use_login_hash,
@@ -50,6 +50,25 @@ def view_text(_, path=''):
     html_content = template.render(path_parts=path_parts, contents=contents, error=error)
     return response.html(html_content)
 
+def get_file_size(path):
+    try:
+        return os.path.getsize(path)
+    except IOError:
+        return None
+
+
+def get_display_file_size(file_size):
+    if file_size is None:
+        return ''
+
+    return format_bytes(file_size)
+
+
+def get_display_file_size_search(file_size):
+    if file_size is None:
+        return ''
+
+    return str(file_size)
 
 def list_directory(path, display_path, is_logged_in):
     if display_path == '':
@@ -85,13 +104,9 @@ def list_directory(path, display_path, is_logged_in):
             date_modified_iso = 'Unknown'
             date_modified_str = 'Unknown'
 
-        file_size_str = ''
-        file_size_search_str = ''
-        if is_directory is False:
-            file_size = os.path.getsize(full_path)
-
-            file_size_str = format_bytes(file_size)
-            file_size_search_str = str(file_size)
+        file_size = get_file_size(full_path)
+        file_size_str = get_display_file_size(file_size)
+        file_size_search_str = get_display_file_size_search(file_size)
 
         # used to know whether to show the play media icon
         is_media = False
@@ -180,10 +195,10 @@ async def handle_path(request, path):
             range_ = range_header.split('=')[1]
             requested_start, requested_end = range_.split('-')
 
-            if requested_start is not '':
+            if requested_start != '':
                 range_object.start = int(requested_start)
 
-            if requested_end is not '':
+            if requested_end != '':
                 range_object.end = int(requested_end)
 
             range_object.end = min(range_object.end, range_object.start + chunk_size - 1)
@@ -202,7 +217,10 @@ async def handle_path(request, path):
         )
 
 @bp.route('/')
-@bp.route('/path')
+async def redirect_example(_request):
+    return response.redirect('/path/')
+
+
 @bp.route('/path/<path:path>')
 @conditional_decorator(auth.login_required, use_login_hash)
 async def path(request, path=''):
