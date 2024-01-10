@@ -5,17 +5,9 @@ import bcrypt
 import types
 from datetime import datetime
 from sanic_auth import User
-from util import conditional_decorator, get_path_parts, format_bytes
-from core import (
-    auth,
-    env,
-    use_login_hash,
-    supported_media_extensions,
-    sharable_salt,
-    sharable_secret_key,
-    guid,
-    login_hashes
-)
+from simplewebserver.util import conditional_decorator, get_path_parts, format_bytes
+from simplewebserver.core import auth, env, use_login_hash, supported_media_extensions, sharable_salt, \
+                                 sharable_secret_key, guid, login_hashes
 
 bp = Blueprint('routes')
 

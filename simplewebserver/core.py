@@ -4,7 +4,7 @@ import docopt
 import os
 import sys
 from jinja2 import Environment, FileSystemLoader
-from util import generate_random_hash
+from simplewebserver.util import generate_random_hash
 
 help_string = """
 Usage:

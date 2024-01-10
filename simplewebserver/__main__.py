@@ -1,38 +1,11 @@
 from sanic import Sanic
-import sanic_cookiesession
+from sanic.worker.loader import AppLoader
 from getpass import getpass
 import os
 import bcrypt
 import ssl
-from util import generate_random_hash
-from routes import bp
-from core import auth, dir_path, guid, host, port, generate_login_hash, use_login_hash, certificate_file, certificate_key, allow_insecure
-
-# initialise Sanic
-app = Sanic(__name__)
-
-static_directory = os.path.join(dir_path, 'static')
-app.static('/static', static_directory)
-
-app.blueprint(bp)
-
-# initialise Sanic-CookieSession
-# using a random hash as the secret key will mean sessions won't persist between process restarts, however the
-# alternative would either be adding a command line argument which would be insecure (bcrypt hash is slow enough to
-# crack to not be an issue1)
-app.config['SESSION_COOKIE_SECRET_KEY'] = generate_random_hash()
-app.config['SESSION_COOKIE_SALT'] = generate_random_hash()
-app.config['SESSION_COOKIE_NAME'] = '_{guid}_session'.format(guid=guid)
-
-if allow_insecure is True:
-    # allows cookies to be set over http instead of just https
-    app.config['SESSION_COOKIE_SECURE'] = False
-
-sanic_cookiesession.setup(app)
-
-# initialise Sanic-Auth
-app.config.AUTH_LOGIN_ENDPOINT = 'routes.login'
-auth = auth.setup(app)
+from simplewebserver.app import create_app
+from simplewebserver.core import host, port, generate_login_hash, use_login_hash, certificate_file, certificate_key, allow_insecure
 
 
 def generate_login_hash_function():
@@ -61,10 +34,14 @@ if __name__ == '__main__':
         print("Authentication without SSL is only possible if the --allow-insecure flag is set.")
         print("Only use if you are aware of the security implications.")
     else:
-        # setup ssl
-        context = None
-        if certificate_file is not None and certificate_key is not None:
-            context = ssl.create_default_context(purpose=ssl.Purpose.CLIENT_AUTH)
-            context.load_cert_chain(certificate_file, keyfile=certificate_key)
+        os.environ['SANIC_IGNORE_PRODUCTION_WARNING'] = 'true'
 
-        app.run(host=host, port=port, debug=False, ssl=context)
+        # setup ssl
+        ssl = None
+        if certificate_file is not None and certificate_key is not None:
+            ssl = dict(cert=certificate_file, key=certificate_key)
+
+        loader = AppLoader(factory=create_app)
+        app = loader.load()
+        app.prepare(host=host, port=port, dev=False, debug=False, ssl=ssl)
+        Sanic.serve(primary=app, app_loader=loader)
