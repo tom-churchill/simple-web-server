@@ -1,10 +1,9 @@
 [project]
 name = "simple_web_server"
-version = "1.0.0"
+version = "1.1.0"
 description = "An alternative to http.server which supports multiple connections, authentication and SSL."
 authors = [
     {name = "Tom Churchill", email = "tom@tomchurchill.co.uk"},
-    {name = "Tom Churchill", email = "tom@tomchurchill.co.uk "},
 ]
 dependencies = [
     "setuptools>=69.0.3",
@@ -22,7 +21,7 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Operating System :: Microsoft :: Windows",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.10",
 ]
 
 
