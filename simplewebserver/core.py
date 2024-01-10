@@ -2,7 +2,8 @@ import bcrypt
 from sanic_auth import Auth
 import docopt
 import os
-from jinja2 import Environment, PackageLoader
+import sys
+from jinja2 import Environment, FileSystemLoader
 from util import generate_random_hash
 
 help_string = """
@@ -59,4 +60,6 @@ if use_login_hash is not None:
         except ValueError:
             raise ValueError("Invalid login hash")
 
-env = Environment(loader=PackageLoader('simplewebserver', 'templates'))
+package_directory = os.path.dirname(sys.argv[0])
+template_directory = os.path.join(package_directory, 'templates')
+env = Environment(loader=FileSystemLoader(template_directory))
