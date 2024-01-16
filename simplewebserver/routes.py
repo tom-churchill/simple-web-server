@@ -8,6 +8,7 @@ from sanic_auth import User
 from simplewebserver.util import conditional_decorator, get_path_parts, format_bytes
 from simplewebserver.core import auth, env, use_login_hash, supported_media_extensions, sharable_salt, \
                                  sharable_secret_key, guid, login_hashes
+from urllib.parse import unquote
 
 bp = Blueprint('routes')
 
@@ -213,6 +214,7 @@ async def redirect_example(_request):
 @bp.route('/path/<path:path>')
 @conditional_decorator(auth.login_required, use_login_hash)
 async def path(request, path=''):
+    path = unquote(path)
     return await handle_path(request, path)
 
 
