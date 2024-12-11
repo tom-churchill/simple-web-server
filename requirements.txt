@@ -24,4 +24,4 @@ Sanic-Auth==0.2.0
 Sanic-CookieSession==0.2.0
 six==1.12.0
 urllib3==1.25.3
-websockets==7.0
+websockets==9.1
